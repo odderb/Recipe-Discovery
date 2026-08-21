@@ -1,0 +1,7 @@
+{
+  "mixedrecipe.locked": "Recipe not unlocked.",
+  "mixedrecipes.recipes_unlocked": "%s recipe unlocked.",
+  "mixedrecipes.recipes_unlocked_plural": "%s recipes unlocked.",
+  "mixedrecipes.config.hoverclear": "Clears the recipe view status on hover as opposed to click, useful when there are A LOT of items",
+  "tab.mixedrecipe.unviewed": "Unviewed Recipes"
+}

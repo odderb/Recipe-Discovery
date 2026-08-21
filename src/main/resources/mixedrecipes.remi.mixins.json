@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "com.odder.mixedrecipes.integrations.remi.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AddUnviewedTabMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
