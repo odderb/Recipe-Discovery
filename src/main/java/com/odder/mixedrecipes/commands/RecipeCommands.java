@@ -3,7 +3,9 @@ package com.odder.mixedrecipes.commands;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.odder.mixedrecipes.MixedRecipes;
 import com.odder.mixedrecipes.attachment.Attachments;
+import com.odder.mixedrecipes.recipe.RecipeUtilities;
 import com.odder.mixedrecipes.unlocks.UnlockTracker;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -32,6 +34,11 @@ public class RecipeCommands {
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "players");
 
         for (ServerPlayer player : targets) {
+            MixedRecipes.LOGGER.info("Size before {}", player.recipeBook.known.size());
+            var recipes = RecipeUtilities.getRecipes(player.server.getRecipeManager(), player.recipeBook.known);
+            player.resetRecipes(recipes);
+            MixedRecipes.LOGGER.info("Size after {}", player.recipeBook.known.size());
+
             player.setData(Attachments.UNLOCKED_RECIPES, new HashSet<>());
             player.setData(Attachments.SEEN_ITEMS, new HashSet<>());
             player.setData(Attachments.UNVIEWED_ITEMS, new HashSet<>());

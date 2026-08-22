@@ -3,12 +3,9 @@
   "package": "com.odder.mixedrecipes.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "GateRecipesMixin",
     "RecipePopupMixin",
-    "SidebarLookupMixin",
-    "ScreenSpaceMixin",
-    "EmiStackListMixin",
-    "EmiSearchMixin"
+    "RecipeButtonHighlightMixin",
+    "RecipeBookComponentClearHighlightMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -22,9 +22,11 @@ public class MixedRecipes {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static boolean REMI_ENABLED = false;
+    public static boolean EMI_ENABLED = false;
 
     public MixedRecipes(IEventBus modEventBus, ModContainer modContainer) {
         REMI_ENABLED = ModList.get().isLoaded("remi");
+        EMI_ENABLED = ModList.get().isLoaded("emi");
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 

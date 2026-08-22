@@ -1,6 +1,8 @@
-package com.odder.mixedrecipes;
+package com.odder.mixedrecipes.integrations.emi;
 
+import com.odder.mixedrecipes.MixedRecipes;
 import com.odder.mixedrecipes.attachment.Attachments;
+import com.odder.mixedrecipes.integrations.StackCache;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.runtime.EmiSidebars;
@@ -16,9 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class StackCache {
-    public static final StackCache INSTANCE = new StackCache();
-
+public class EmiStackCache implements StackCache {
     private final HashMap<SidebarType, List<? extends EmiIngredient>> cache = new HashMap<>();
     private final HashMap<SidebarType, Boolean> dirty = new HashMap<>();
     private final HashMap<SidebarType, List<? extends EmiIngredient>> lastProvided = new HashMap<>();
@@ -41,7 +41,7 @@ public class StackCache {
         MixedRecipes.LOGGER.debug("EMI sidebar {} was marked dirty", sidebarType);
     }
 
-    public void markAllDirty() {
+    public void markDirty() {
         for(SidebarType sidebarType : SidebarType.values()) {
             markDirty(sidebarType);
         }

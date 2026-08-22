@@ -1,15 +1,12 @@
-package com.odder.mixedrecipes.mixin;
+package com.odder.mixedrecipes.integrations.emi.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.odder.mixedrecipes.attachment.Attachments;
 import com.odder.mixedrecipes.recipe.LockedRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
-import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 

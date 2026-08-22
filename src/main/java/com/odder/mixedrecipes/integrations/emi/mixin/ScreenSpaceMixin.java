@@ -1,8 +1,9 @@
-package com.odder.mixedrecipes.mixin;
+package com.odder.mixedrecipes.integrations.emi.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.odder.mixedrecipes.MixedRecipes;
-import com.odder.mixedrecipes.StackCache;
+import com.odder.mixedrecipes.integrations.StackCacheManager;
+import com.odder.mixedrecipes.integrations.emi.EmiStackCache;
 import com.odder.mixedrecipes.unlocks.UnlockTracker;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.runtime.EmiDrawContext;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Mixin(EmiScreenManager.ScreenSpace.class)
 public abstract class ScreenSpaceMixin {
+    private static final EmiStackCache EMI_STACK_CACHE = new EmiStackCache();
     private static final ResourceLocation BADGE_TEX = ResourceLocation.fromNamespaceAndPath(MixedRecipes.MODID, "textures/gui/highlight.png");
 
     @ModifyReturnValue(method = "getStacks", at = @At("RETURN"))
@@ -26,9 +28,9 @@ public abstract class ScreenSpaceMixin {
         EmiScreenManager.ScreenSpace self = (EmiScreenManager.ScreenSpace)((Object)this);
 
         // update what EMI was going to return, stack cache handles the rest.
-        StackCache.INSTANCE.updateLastEmiProvided(self.getType(), original);
+        EMI_STACK_CACHE.updateLastEmiProvided(self.getType(), original);
 
-        var cached = StackCache.INSTANCE.getStacks(self.getType());
+        var cached = EMI_STACK_CACHE.getStacks(self.getType());
 
         if (cached.isPresent()) {
             return cached.get();
@@ -72,5 +74,9 @@ public abstract class ScreenSpaceMixin {
                 }
             }
         }
+    }
+
+    static {
+        StackCacheManager.INSTANCE.register(EMI_STACK_CACHE);
     }
 }

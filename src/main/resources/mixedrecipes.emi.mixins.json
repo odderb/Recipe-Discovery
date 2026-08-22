@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "com.odder.mixedrecipes.integrations.emi.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "GateRecipesMixin",
+    "SidebarLookupMixin",
+    "ScreenSpaceMixin",
+    "EmiStackListMixin",
+    "EmiSearchMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

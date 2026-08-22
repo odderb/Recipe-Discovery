@@ -1,7 +1,7 @@
 package com.odder.mixedrecipes.packet;
 
 import com.odder.mixedrecipes.MixedRecipes;
-import com.odder.mixedrecipes.StackCache;
+import com.odder.mixedrecipes.integrations.StackCacheManager;
 import com.odder.mixedrecipes.integrations.remi.CreativeTab;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.player.LocalPlayer;
@@ -23,7 +23,10 @@ public record NotifyUnlocksPacket() implements CustomPacketPayload {
 
     public static void handle(NotifyUnlocksPacket packet, IPayloadContext ctx) {
         if (ctx.player() instanceof LocalPlayer) {
-            StackCache.INSTANCE.markAllDirty();
+            if (MixedRecipes.EMI_ENABLED) {
+                StackCacheManager.INSTANCE.notifyChanged();
+            }
+
             if (MixedRecipes.REMI_ENABLED) {
                 CreativeTab.refresh();
             }

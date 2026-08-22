@@ -1,6 +1,6 @@
-package com.odder.mixedrecipes.mixin;
+package com.odder.mixedrecipes.integrations.emi.mixin;
 
-import com.odder.mixedrecipes.StackCache;
+import com.odder.mixedrecipes.integrations.StackCacheManager;
 import dev.emi.emi.search.EmiSearch;
 import net.neoforged.fml.util.thread.EffectiveSide;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +13,6 @@ public class EmiSearchMixin {
     @Inject(method = "update", at = @At("TAIL"))
     private static void mixedrecipes$update(CallbackInfo ci) {
         if (!EffectiveSide.get().isClient()) return;
-        StackCache.INSTANCE.markAllDirty();
+        StackCacheManager.INSTANCE.notifyChanged();
     }
 }

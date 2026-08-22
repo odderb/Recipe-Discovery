@@ -1,7 +1,6 @@
-package com.odder.mixedrecipes.mixin;
+package com.odder.mixedrecipes.integrations.emi.mixin;
 
 import com.odder.mixedrecipes.MixedRecipesClient;
-import com.odder.mixedrecipes.unlocks.UnlockTracker;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiSidebars;

@@ -12,7 +12,7 @@ import java.util.List;
 
 @Mixin(value = CreativeModeTabManager.class, remap = false)
 public class AddUnviewedTabMixin {
-    @Inject(method = "getVisibleCreativeModeTabs", at = @At("TAIL"), cancellable = true)
+    @Inject(method = "getVisibleCreativeModeTabs", at = @At("TAIL"))
     private static void mixedrecipes$shouldHideTab(CallbackInfoReturnable<List<CreativeModeTab>> cir) {
         if (!CreativeTab.UNVIEWED_TAB.isBound()) return;
 

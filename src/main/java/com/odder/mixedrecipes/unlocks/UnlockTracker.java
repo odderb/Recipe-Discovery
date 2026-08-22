@@ -1,18 +1,12 @@
 package com.odder.mixedrecipes.unlocks;
 
 import com.odder.mixedrecipes.MixedRecipes;
-import com.odder.mixedrecipes.StackCache;
 import com.odder.mixedrecipes.attachment.Attachments;
-import com.odder.mixedrecipes.integrations.remi.CreativeTab;
-import com.odder.mixedrecipes.packet.MarkViewedPacket;
 import com.odder.mixedrecipes.packet.NotifyUnlocksPacket;
 import com.odder.mixedrecipes.recipe.RecipeIndex;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -49,6 +43,8 @@ public class UnlockTracker {
                     current.add(key.location());
                 });
             });
+
+        player.awardRecipes(recipes);
 
         if (!current.isEmpty()) {
             player.setData(Attachments.UNVIEWED_ITEMS, current);

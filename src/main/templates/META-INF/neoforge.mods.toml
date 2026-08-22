@@ -33,6 +33,10 @@ Makes your resident recipe viewer a little more vanilla flavored.
 config="${mod_id}.mixins.json"
 
 [[mixins]]
+config="${mod_id}.emi.mixins.json"
+dependencies = ["emi"]
+
+[[mixins]]
 config="${mod_id}.remi.mixins.json"
 dependencies = ["remi"]
 

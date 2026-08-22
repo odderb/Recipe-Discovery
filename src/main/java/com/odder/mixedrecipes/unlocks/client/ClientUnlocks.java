@@ -2,7 +2,7 @@ package com.odder.mixedrecipes.unlocks.client;
 
 import com.evandev.remi.feature.creativemodetab.CreativeModeTabManager;
 import com.odder.mixedrecipes.MixedRecipes;
-import com.odder.mixedrecipes.StackCache;
+import com.odder.mixedrecipes.integrations.StackCacheManager;
 import com.odder.mixedrecipes.attachment.Attachments;
 import com.odder.mixedrecipes.integrations.remi.CreativeTab;
 import com.odder.mixedrecipes.packet.MarkViewedPacket;
@@ -32,7 +32,7 @@ public class ClientUnlocks {
             player.setData(Attachments.UNVIEWED_ITEMS, localData);
         }
 
-        StackCache.INSTANCE.markAllDirty();
+        StackCacheManager.INSTANCE.notifyChanged();
     }
 
     @SubscribeEvent

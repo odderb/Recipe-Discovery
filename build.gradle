@@ -109,11 +109,14 @@ configurations {
 
 dependencies {
     compileOnly ("dev.emi:emi-neoforge:${emi_version}:api")
-    implementation ("dev.emi:emi-neoforge:${emi_version}")
+    compileOnly ("dev.emi:emi-neoforge:${emi_version}")
 
     compileOnly "curse.maven:reliable-emi-1411826:8686700"
     compileOnly "maven.modrinth:yacl:${yacl_version}-neoforge"
 
+    if (project.hasProperty("withEmi")) {
+        localRuntime "dev.emi:emi-neoforge:${emi_version}"
+    }
 
     if (project.hasProperty("withReliable")) {
         localRuntime "curse.maven:reliable-emi-1411826:8686700"
