@@ -23,9 +23,7 @@ public record NotifyUnlocksPacket() implements CustomPacketPayload {
 
     public static void handle(NotifyUnlocksPacket packet, IPayloadContext ctx) {
         if (ctx.player() instanceof LocalPlayer) {
-            if (MixedRecipes.EMI_ENABLED) {
-                StackCacheManager.INSTANCE.notifyChanged();
-            }
+            StackCacheManager.INSTANCE.notifyChanged();
 
             if (MixedRecipes.REMI_ENABLED) {
                 CreativeTab.refresh();

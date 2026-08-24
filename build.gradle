@@ -21,6 +21,17 @@ sourceSets.main.resources {
 
 repositories {
     maven {
+        // location of the maven that hosts JEI files since January 2023
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
+
+    maven {
         name = "Sleeping Town"
         url = "https://repo.sleeping.town/"
     }
@@ -114,6 +125,8 @@ dependencies {
     compileOnly "curse.maven:reliable-emi-1411826:8686700"
     compileOnly "maven.modrinth:yacl:${yacl_version}-neoforge"
 
+    compileOnly("mezz.jei:jei-${minecraft_soft_version}-neoforge-api:${jei_version}")
+
     if (project.hasProperty("withEmi")) {
         localRuntime "dev.emi:emi-neoforge:${emi_version}"
     }
@@ -121,6 +134,10 @@ dependencies {
     if (project.hasProperty("withReliable")) {
         localRuntime "curse.maven:reliable-emi-1411826:8686700"
         localRuntime "maven.modrinth:yacl:${yacl_version}-neoforge"
+    }
+
+    if (project.hasProperty("withJei")) {
+        localRuntime "mezz.jei:jei-${minecraft_soft_version}-neoforge:${jei_version}"
     }
 }
 

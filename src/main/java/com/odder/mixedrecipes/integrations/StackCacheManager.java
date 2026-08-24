@@ -1,29 +1,41 @@
 package com.odder.mixedrecipes.integrations;
 
+import com.evandev.remi.integration.emi.StackManager;
 import com.odder.mixedrecipes.MixedRecipes;
-import com.odder.mixedrecipes.attachment.Attachments;
-import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.config.SidebarType;
-import dev.emi.emi.runtime.EmiSidebars;
-import dev.emi.emi.screen.EmiScreenManager;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
+import com.odder.mixedrecipes.events.StackCacheRebuiltEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class StackCacheManager {
     public static final StackCacheManager INSTANCE = new StackCacheManager();
 
     private final Collection<StackCache> caches = new ArrayList<>();
+    private final HashSet<StackCache> busyCaches = new HashSet<>();
 
     public void notifyChanged() {
         caches.forEach(StackCache::markDirty);
+        busyCaches.addAll(caches);
+
+        // TODO: find a better place for dis
+        if (MixedRecipes.REMI_ENABLED) {
+            StackManager.invalidateStacks();
+        }
     }
 
     public void register(StackCache cache) {
         caches.add(cache);
+    }
+
+    @SubscribeEvent
+    private void onClientTick(ClientTickEvent.Post ev) {
+        for (StackCache cache : new HashSet<>(busyCaches)) {
+            if (!cache.isBusy()) {
+                busyCaches.remove(cache);
+                NeoForge.EVENT_BUS.post(new StackCacheRebuiltEvent(cache));
+            }
+        }
     }
 }

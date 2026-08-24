@@ -2,11 +2,14 @@ package com.odder.mixedrecipes.unlocks;
 
 import com.odder.mixedrecipes.MixedRecipes;
 import com.odder.mixedrecipes.attachment.Attachments;
+import com.odder.mixedrecipes.attachment.UnviewedItems;
 import com.odder.mixedrecipes.packet.NotifyUnlocksPacket;
 import com.odder.mixedrecipes.recipe.RecipeIndex;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -28,9 +31,9 @@ public class UnlockTracker {
     public UnlockTracker() { }
 
     public void registerUnlock(ServerPlayer player, Collection<RecipeHolder<?>> recipes) {
-        var current = new HashSet<>(player.getData(Attachments.UNVIEWED_ITEMS));
+        var unviewedItems = new HashSet<ResourceLocation>();
         var unlocks = new HashSet<>(player.getData(Attachments.UNLOCKED_RECIPES));
-        var provider = player.level().registryAccess();
+        var provider = player.server.registryAccess();
 
         recipes.forEach(holder -> {
                 unlocks.add(holder.id());
@@ -39,15 +42,16 @@ public class UnlockTracker {
 
                 if (stack.isEmpty()) return;
 
-                stack.getItemHolder().unwrapKey().ifPresent(key -> {
-                    current.add(key.location());
-                });
+                stack.getItemHolder().unwrapKey().ifPresent(key -> unviewedItems.add(key.location()));
             });
 
         player.awardRecipes(recipes);
 
-        if (!current.isEmpty()) {
-            player.setData(Attachments.UNVIEWED_ITEMS, current);
+        if (!unviewedItems.isEmpty()) {
+            UnviewedItems.addUnviewedItems(player, unviewedItems);
+        }
+
+        if (!unlocks.isEmpty()) {
             player.setData(Attachments.UNLOCKED_RECIPES, unlocks);
 
             PacketDistributor.sendToPlayer(player, new NotifyUnlocksPacket());
@@ -56,15 +60,11 @@ public class UnlockTracker {
         }
     }
 
-    public boolean shouldHighlightUnlock(Player player, Item item) {
-        return player.getData(Attachments.UNVIEWED_ITEMS).contains(BuiltInRegistries.ITEM.getKey(item));
-    }
-
     public void initializeForPlayer(ServerPlayer player) {
         var unlocks = player.getData(Attachments.UNLOCKED_RECIPES);
         if (unlocks.isEmpty()) {
             registerUnlock(player, index.getDefaultUnlocks());
-            player.setData(Attachments.UNVIEWED_ITEMS, new HashSet<>());
+            UnviewedItems.clearUnviewedItems(player);
         }
     }
 
@@ -122,7 +122,11 @@ public class UnlockTracker {
             if (unlocked.isEmpty()) return;
 
             registerUnlock(player, unlocked);
-            player.sendSystemMessage(Component.literal(String.format("You unlocked %d recipes", unlocked.size())));
+            Component unlockMsg = Component.translatable("mixedrecipes.recipes_unlocked", unlocked.size());
+            if (unlocked.size() > 1) {
+                unlockMsg = Component.translatable("mixedrecipes.recipes_unlocked_plural", unlocked.size());
+            }
+            player.sendSystemMessage(unlockMsg);
         }
     }
 }

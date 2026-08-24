@@ -40,6 +40,13 @@ public class CreativeTab {
                     .stream()
                     .map(ra::get)
                     .filter(Objects::nonNull)
+                    .peek(item -> {
+                        if (item.getDefaultInstance().getCount() != 1) {
+                            MixedRecipes.LOGGER.warn("Item \"{}\" is unviewed and lacks a default count of 1!", item.getDefaultInstance().getDisplayName());
+                        }
+                    })
+                    .filter(item -> item.getDefaultInstance().getCount() == 1)
+                    .map(item -> item.getDefaultInstance().copyWithCount(1))
                     .forEach(output::accept);
         }
     }

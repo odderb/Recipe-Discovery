@@ -1,5 +1,6 @@
 package com.odder.mixedrecipes.recipe;
 
+import dev.emi.emi.api.recipe.BasicEmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -13,55 +14,14 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.List;
 
-public class LockedRecipe implements EmiRecipe {
+public class LockedRecipe extends BasicEmiRecipe {
     private static final int TEXT_COLOR = 0xFFFFFF;
 
-    private final EmiRecipe delegate;
     private final RecipeHolder<?> holder;
 
     public LockedRecipe(EmiRecipe delegate, RecipeHolder<?> recipeHolder) {
-        this.delegate = delegate;
+        super(delegate.getCategory(), recipeHolder.id(), delegate.getDisplayWidth(), delegate.getDisplayHeight());
         this.holder = recipeHolder;
-    }
-
-    @Override
-    public EmiRecipeCategory getCategory() {
-        return delegate.getCategory();
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return delegate.getId();
-    }
-
-    @Override
-    public List<EmiIngredient> getInputs() {
-        return delegate.getInputs();
-    }
-
-    @Override
-    public List<EmiStack> getOutputs() {
-        return delegate.getOutputs();
-    }
-
-    @Override
-    public List<EmiIngredient> getCatalysts() {
-        return delegate.getCatalysts();
-    }
-
-    @Override
-    public int getDisplayWidth() {
-        return delegate.getDisplayWidth();
-    }
-
-    @Override
-    public int getDisplayHeight() {
-        return delegate.getDisplayHeight();
-    }
-
-    @Override
-    public boolean supportsRecipeTree() {
-        return false;
     }
 
     @Override

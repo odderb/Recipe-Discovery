@@ -2,10 +2,14 @@ package com.odder.mixedrecipes;
 
 import com.odder.mixedrecipes.attachment.Attachments;
 import com.odder.mixedrecipes.commands.RecipeCommands;
+import com.odder.mixedrecipes.integrations.StackCacheManager;
 import com.odder.mixedrecipes.integrations.remi.CreativeTab;
 import com.odder.mixedrecipes.packet.Packets;
 import com.odder.mixedrecipes.unlocks.UnlockTracker;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.util.thread.EffectiveSide;
 import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 
@@ -31,14 +35,22 @@ public class MixedRecipes {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
         modEventBus.addListener(Packets::register);
+        modEventBus.addListener(this::onConfigReloaded);
         Attachments.ATTACHMENTS.register(modEventBus);
 
         NeoForge.EVENT_BUS.register(UnlockTracker.INSTANCE);
         NeoForge.EVENT_BUS.register(RecipeCommands.class);
+        NeoForge.EVENT_BUS.register(StackCacheManager.INSTANCE);
 
         if (REMI_ENABLED) {
             // Creative tab only exists for REMI integration
             CreativeTab.register(modEventBus);
+        }
+    }
+
+    private void onConfigReloaded(final ModConfigEvent.Reloading ev) {
+        if (EffectiveSide.get().isClient()) {
+            StackCacheManager.INSTANCE.notifyChanged();
         }
     }
 }

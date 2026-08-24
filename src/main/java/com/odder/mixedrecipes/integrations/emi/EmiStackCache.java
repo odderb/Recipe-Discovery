@@ -1,7 +1,9 @@
 package com.odder.mixedrecipes.integrations.emi;
 
+import com.odder.mixedrecipes.Config;
 import com.odder.mixedrecipes.MixedRecipes;
 import com.odder.mixedrecipes.attachment.Attachments;
+import com.odder.mixedrecipes.integrations.OutputItemsStackCache;
 import com.odder.mixedrecipes.integrations.StackCache;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.config.SidebarType;
@@ -22,6 +24,12 @@ public class EmiStackCache implements StackCache {
     private final HashMap<SidebarType, List<? extends EmiIngredient>> cache = new HashMap<>();
     private final HashMap<SidebarType, Boolean> dirty = new HashMap<>();
     private final HashMap<SidebarType, List<? extends EmiIngredient>> lastProvided = new HashMap<>();
+    private final OutputItemsStackCache outputItemsStackCache = new OutputItemsStackCache();
+
+    @Override
+    public boolean isBusy() {
+        return !dirty.isEmpty();
+    }
 
     public void updateLastEmiProvided(SidebarType type, List<? extends EmiIngredient> original) {
         var current = lastProvided.getOrDefault(type, null);
@@ -33,6 +41,9 @@ public class EmiStackCache implements StackCache {
     }
 
     public void markDirty(SidebarType sidebarType) {
+        if (dirty.getOrDefault(sidebarType, false)) return;
+
+        outputItemsStackCache.markDirty();
         dirty.put(sidebarType, true);
         var sidebar = EmiScreenManager.getPanelFor(sidebarType);
         if (sidebar != null) {
@@ -45,6 +56,7 @@ public class EmiStackCache implements StackCache {
         for(SidebarType sidebarType : SidebarType.values()) {
             markDirty(sidebarType);
         }
+        outputItemsStackCache.markDirty();
     }
 
     public Optional<List<? extends EmiIngredient>> getStacks(SidebarType sidebarType) {
@@ -74,8 +86,17 @@ public class EmiStackCache implements StackCache {
                 .map(EmiIngredient::of)
                 .collect(Collectors.toSet());
 
+        boolean hideLocked = Config.HIDE_LOCKED_RECIPES.get();
+
         var sorted = original.stream()
                 .sorted(Comparator.comparingInt(i -> data.contains(i) ? 0 : 1))
+                .filter(ingredient -> {
+                    if (hideLocked) {
+                        return ingredient.getEmiStacks().stream().allMatch(stack -> outputItemsStackCache.isUnlocked(stack.getId()));
+                    }
+
+                    return true;
+                })
                 .toList();
 
         cache.put(sidebarType, sorted);
