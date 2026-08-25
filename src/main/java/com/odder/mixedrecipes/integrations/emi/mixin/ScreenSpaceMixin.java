@@ -1,6 +1,5 @@
 package com.odder.mixedrecipes.integrations.emi.mixin;
 
-import com.evandev.remi.integration.emi.StackManager;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.odder.mixedrecipes.MixedRecipes;

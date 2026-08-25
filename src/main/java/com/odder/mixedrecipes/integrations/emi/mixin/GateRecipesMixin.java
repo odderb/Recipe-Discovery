@@ -1,13 +1,17 @@
 package com.odder.mixedrecipes.integrations.emi.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.odder.mixedrecipes.attachment.Attachments;
 import com.odder.mixedrecipes.recipe.LockedRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.List;
@@ -16,13 +20,22 @@ import java.util.List;
 public class GateRecipesMixin {
     @ModifyReturnValue(method = "getRecipesByOutput", at = @At("RETURN"))
     private List<EmiRecipe> mixedrecipes$gateRecipes(List<EmiRecipe> original) {
+        return mixedrecipes$filterToKnown(original);
+    }
+
+    @ModifyReturnValue(method = "getRecipesByInput", at = @At("RETURN"))
+    private List<EmiRecipe> mixedrecipes$getRecipesByInput(List<EmiRecipe> original) {
+        return mixedrecipes$filterToKnown(original);
+    }
+
+    @Unique private List<EmiRecipe> mixedrecipes$filterToKnown(List<EmiRecipe> provided) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.level == null) return original;
+        if (mc.player == null || mc.level == null) return provided;
 
         var unlocks = mc.player.getData(Attachments.UNLOCKED_RECIPES);
         var rm = mc.level.getRecipeManager();
 
-        return original.stream().map(r -> {
+        return provided.stream().map(r -> {
             ResourceLocation id = r.getId();
             if (id == null) return r;
             RecipeHolder<?> holder = rm.byKey(id).orElse(null);
