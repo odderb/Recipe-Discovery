@@ -1,23 +1,24 @@
 package com.odder.mixedrecipes.integrations.emi;
 
+import com.evandev.remi.feature.stackgroup.EmiGroupStack;
+import com.evandev.remi.feature.stackgroup.data.EmiStackGroup;
 import com.odder.mixedrecipes.Config;
 import com.odder.mixedrecipes.MixedRecipes;
 import com.odder.mixedrecipes.attachment.Attachments;
 import com.odder.mixedrecipes.integrations.OutputItemsStackCache;
 import com.odder.mixedrecipes.integrations.StackCache;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.runtime.EmiSidebars;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class EmiStackCache implements StackCache {
@@ -76,6 +77,9 @@ public class EmiStackCache implements StackCache {
         List<? extends EmiIngredient> original = lastProvided.getOrDefault(sidebarType, EmiSidebars.getStacks(sidebarType));
 
         var player = Minecraft.getInstance().player;
+        var seen = player.getData(Attachments.SEEN_ITEMS)
+                .stream().map(Holder::value)
+                .collect(Collectors.toSet());
 
         var data = player
                 .getData(Attachments.UNVIEWED_ITEMS)
@@ -87,16 +91,36 @@ public class EmiStackCache implements StackCache {
                 .collect(Collectors.toSet());
 
         boolean hideLocked = Config.HIDE_LOCKED_RECIPES.get();
+        HashSet<EmiIngredient> groupIngredients = new HashSet<>();
 
         var sorted = original.stream()
-                .sorted(Comparator.comparingInt(i -> data.contains(i) ? 0 : 1))
                 .filter(ingredient -> {
                     if (hideLocked) {
+                        List<EmiStack> stacks = ingredient.getEmiStacks();
+
+                        if (MixedRecipes.REMI_ENABLED) {
+                            if (ingredient instanceof EmiGroupStack group) {
+                                stacks = group.getItems().stream().flatMap(item -> item.getEmiStacks().stream()).toList();
+                            }
+                        }
+                        boolean hasSeen = stacks.stream().anyMatch(stack -> seen.contains(stack.getItemStack().getItem()));
+                        if (hasSeen) {
+                            return true;
+                        }
+
                         return ingredient.getEmiStacks().stream().allMatch(stack -> outputItemsStackCache.isUnlocked(stack.getId()));
                     }
 
                     return true;
                 })
+                .peek(ingredient -> {
+                    if (MixedRecipes.REMI_ENABLED) {
+                        if (ingredient instanceof EmiGroupStack group) {
+                            groupIngredients.addAll(group.getItems().stream().flatMap(item -> item.getEmiStacks().stream()).toList());
+                        }
+                    }
+                })
+                .sorted(Comparator.comparingInt(i -> data.contains(i) && !groupIngredients.contains(i) ? 0 : 1))
                 .toList();
 
         cache.put(sidebarType, sorted);

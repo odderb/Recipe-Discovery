@@ -5,6 +5,8 @@ import com.odder.mixedrecipes.events.RecipeUnlockIndexRebuilding;
 import com.odder.mixedrecipes.recipe.handlers.SmithingTransformRecipeHandler;
 import com.odder.mixedrecipes.unlocks.requirements.OneOfRequirement;
 import com.odder.mixedrecipes.unlocks.requirements.RecipeUnlockRequirement;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
@@ -18,6 +20,7 @@ public class RecipeIndex {
     private final HashMap<RecipeHolder<?>, List<RecipeUnlockRequirement>> recipeToIngredientsIndex = new HashMap<>();
     private final Set<RecipeHolder<?>> defaultUnlocks = new HashSet<>();
     private final IngredientRetriever ingredientRetriever = new IngredientRetriever();
+    private final Set<Item> noRecipes = new HashSet<>();
 
     public RecipeIndex() {
         ingredientRetriever.registerHandler(SmithingTransformRecipe.class, new SmithingTransformRecipeHandler());
@@ -31,6 +34,8 @@ public class RecipeIndex {
         return recipeItemIndex.getOrDefault(item, new ArrayList<>());
     }
 
+    public boolean isOutputOfRecipe(Item item) { return !noRecipes.contains(item); }
+
     public List<RecipeUnlockRequirement> getRequirements(RecipeHolder<?> recipeHolder) {
         return recipeToIngredientsIndex.getOrDefault(recipeHolder, new ArrayList<>());
     }
@@ -42,6 +47,7 @@ public class RecipeIndex {
     public void rebuild(RecipeManager recipeManager) {
         recipeItemIndex.clear();
         recipeToIngredientsIndex.clear();
+        noRecipes.clear();
 
         NeoForge.EVENT_BUS.post(new RecipeUnlockIndexRebuilding(this));
 
@@ -82,6 +88,12 @@ public class RecipeIndex {
             var requirements = recipeToIngredientsIndex.getOrDefault(holder, Collections.emptyList());
             if (requirements.isEmpty()) {
                 defaultUnlocks.add(holder);
+            }
+        }
+
+        for (var item : BuiltInRegistries.ITEM) {
+            if (recipeItemIndex.getOrDefault(item, Collections.emptyList()).isEmpty()) {
+                noRecipes.add(item);
             }
         }
 

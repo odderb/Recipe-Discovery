@@ -4,7 +4,6 @@ import com.odder.mixedrecipes.attachment.Attachments;
 import com.odder.mixedrecipes.recipe.RecipeUtilities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 
 import java.util.HashSet;
 

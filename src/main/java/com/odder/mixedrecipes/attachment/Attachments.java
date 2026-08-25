@@ -38,6 +38,7 @@ public class Attachments {
             ATTACHMENTS.register("seen_items", () ->
                     AttachmentType.<Set<Holder<Item>>>builder(() -> new HashSet<>())
                             .serialize(Codecs.SEEN)
+                            .sync(Codecs.SEEN_STREAM_CODEC)
                             .copyOnDeath()
                             .build());
 }

@@ -1,6 +1,8 @@
 package com.odder.mixedrecipes.integrations.emi.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.evandev.remi.integration.emi.StackManager;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.odder.mixedrecipes.MixedRecipes;
 import com.odder.mixedrecipes.attachment.UnviewedItems;
 import com.odder.mixedrecipes.integrations.StackCacheManager;
@@ -15,25 +17,30 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
-@Mixin(value = EmiScreenManager.ScreenSpace.class, priority = 999, remap = false)
+@Mixin(value = EmiScreenManager.ScreenSpace.class, priority = 2000, remap = false)
 public abstract class ScreenSpaceMixin {
     private static final EmiStackCache EMI_STACK_CACHE = new EmiStackCache();
     private static final ResourceLocation BADGE_TEX = ResourceLocation.fromNamespaceAndPath(MixedRecipes.MODID, "textures/gui/highlight.png");
 
-    @Inject(method = "getStacks", at = @At("HEAD"), cancellable = true, remap = false)
-    private void mixedrecipes$getStacks(CallbackInfoReturnable<List<? extends EmiIngredient>> cir) {
+    @WrapMethod(method = "getStacks")
+    private List<? extends EmiIngredient> mixedrecipes$getStacks(Operation<List<? extends EmiIngredient>> op) {
+        var original = op.call();
+
         EmiScreenManager.ScreenSpace self = (EmiScreenManager.ScreenSpace)((Object)this);
 
         // update what EMI was going to return, stack cache handles the rest.
-        EMI_STACK_CACHE.updateLastEmiProvided(self.getType(), cir.getReturnValue());
+        EMI_STACK_CACHE.updateLastEmiProvided(self.getType(), original);
 
         var cached = EMI_STACK_CACHE.getStacks(self.getType());
 
-        cached.ifPresent(cir::setReturnValue);
+        if (cached.isPresent()) {
+            return cached.get();
+        }
+
+        return original;
     }
 
     @Inject(method = "render", at = @At("TAIL"))
