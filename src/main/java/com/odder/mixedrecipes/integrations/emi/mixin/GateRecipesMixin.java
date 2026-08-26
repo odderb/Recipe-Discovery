@@ -28,6 +28,11 @@ public class GateRecipesMixin {
         return mixedrecipes$filterToKnown(original);
     }
 
+    @ModifyReturnValue(method = "getRecipe", at = @At("RETURN"))
+    private EmiRecipe getRecipe(EmiRecipe original) {
+        return mixedrecipes$filterToKnown(List.of(original)).getFirst();
+    }
+
     @Unique private List<EmiRecipe> mixedrecipes$filterToKnown(List<EmiRecipe> provided) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return provided;

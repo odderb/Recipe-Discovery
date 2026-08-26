@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -21,7 +22,10 @@ import java.util.List;
 
 @Mixin(value = EmiScreenManager.ScreenSpace.class, priority = 2000, remap = false)
 public abstract class ScreenSpaceMixin {
+    @Unique
     private static final EmiStackCache EMI_STACK_CACHE = new EmiStackCache();
+
+    @Unique
     private static final ResourceLocation BADGE_TEX = ResourceLocation.fromNamespaceAndPath(MixedRecipes.MODID, "textures/gui/highlight.png");
 
     @WrapMethod(method = "getStacks")

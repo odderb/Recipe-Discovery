@@ -1,10 +1,13 @@
 package com.odder.mixedrecipes.recipe;
 
+import com.odder.mixedrecipes.MixedRecipes;
+import com.odder.mixedrecipes.attachment.Attachments;
 import dev.emi.emi.api.recipe.BasicEmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.TextWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.client.Minecraft;
@@ -16,11 +19,13 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LockedRecipe implements EmiRecipe {
     private static final int TEXT_COLOR = 0xFFFFFF;
     private static final Font FONT = Minecraft.getInstance().font;
+    private static final ResourceLocation MISSING_ITEM_TEXTURE = ResourceLocation.fromNamespaceAndPath(MixedRecipes.MODID, "textures/gui/question-mark.png");
 
     private final EmiRecipe delegate;
     private final RecipeHolder<?> holder;
@@ -42,7 +47,7 @@ public class LockedRecipe implements EmiRecipe {
 
     @Override
     public List<EmiIngredient> getInputs() {
-        return delegate.getInputs();
+        return delegate.getInputs().stream().filter(input -> !input.isEmpty()).toList();
     }
 
     @Override
@@ -66,9 +71,10 @@ public class LockedRecipe implements EmiRecipe {
     @Override
     public int getDisplayHeight() {
         var txt = getItemText();
-        int fontHeight = FONT.lineHeight+2;
-        int totalHeight = (txt.getSiblings().size()+1)*fontHeight;
-        return Math.max(delegate.getDisplayHeight(), totalHeight);
+        int fontHeight = FONT.lineHeight;
+        int totalHeight = (txt.getSiblings().size())*fontHeight;
+        totalHeight += fontHeight;
+        return totalHeight+18+4;
     }
 
     @Override
@@ -78,21 +84,45 @@ public class LockedRecipe implements EmiRecipe {
 
     @Override
     public void addWidgets(WidgetHolder widgets) {
-        int fontHeight = Minecraft.getInstance().font.lineHeight+4;
+        int displayWidth = getDisplayWidth();
+        int heightOffset = 0;
 
-        widgets.addText(
+        var itemsTxt = widgets.addText(
                 getItemText(),
-                getDisplayWidth() / 2, (getDisplayHeight() / 2) - fontHeight,
+                displayWidth / 2, heightOffset,
                 TEXT_COLOR,
                 true
         ).horizontalAlign(TextWidget.Alignment.CENTER);
 
-        widgets.addText(
+        heightOffset += itemsTxt.getBounds().height()+2;
+
+        var lockedTxt = widgets.addText(
                 Component.translatable("mixedrecipe.locked"),
-                getDisplayWidth() / 2, getDisplayHeight() / 2 - 4,
+                displayWidth / 2, heightOffset,
                 TEXT_COLOR,
                 true
         ).horizontalAlign(TextWidget.Alignment.CENTER);
+
+        heightOffset += lockedTxt.getBounds().height()+2;
+
+        var inputs = getInputs().stream().distinct().toList();
+        var seenItems = Minecraft.getInstance().player.getData(Attachments.SEEN_ITEMS);
+        int slotOffset = 0;
+        for (int i = 0; i < inputs.size(); i++) {
+            var input = inputs.get(i);
+            boolean shouldRenderItem = input.getEmiStacks().stream().anyMatch(stack -> seenItems.contains(stack.getItemStack().getItemHolder()));
+            int slotXOffset = slotOffset + (displayWidth/2) - ((inputs.size()*16)/2);
+            SlotWidget slot;
+            if (shouldRenderItem) {
+                slot = widgets.addSlot(input, slotXOffset, heightOffset);
+            } else {
+                slot = widgets.addSlot(slotXOffset, heightOffset);
+                widgets.addTexture(MISSING_ITEM_TEXTURE, slotXOffset, heightOffset, 16, 16, 0, 0, 16, 16, 16, 16);
+            }
+
+            if (slot != null)
+                slotOffset += slot.getBounds().width();
+        }
     }
 
     private Component getItemText() {
