@@ -1,12 +1,9 @@
 package com.odder.mixedrecipes.integrations.emi.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.odder.mixedrecipes.attachment.Attachments;
-import com.odder.mixedrecipes.recipe.LockedRecipe;
+import com.odder.mixedrecipes.integrations.emi.LockedRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -30,12 +27,18 @@ public class GateRecipesMixin {
 
     @ModifyReturnValue(method = "getRecipe", at = @At("RETURN"))
     private EmiRecipe getRecipe(EmiRecipe original) {
+        if (original == null) return null;
         return mixedrecipes$filterToKnown(List.of(original)).getFirst();
     }
 
     @Unique private List<EmiRecipe> mixedrecipes$filterToKnown(List<EmiRecipe> provided) {
         Minecraft mc = Minecraft.getInstance();
+
         if (mc.player == null || mc.level == null) return provided;
+
+        if (mc.player.isCreative()) {
+            return provided;
+        }
 
         var unlocks = mc.player.getData(Attachments.UNLOCKED_RECIPES);
         var rm = mc.level.getRecipeManager();

@@ -2,6 +2,7 @@ package com.odder.mixedrecipes.unlocks.client;
 
 import com.evandev.remi.feature.creativemodetab.CreativeModeTabManager;
 import com.odder.mixedrecipes.MixedRecipes;
+import com.odder.mixedrecipes.MixedRecipesClient;
 import com.odder.mixedrecipes.integrations.StackCacheManager;
 import com.odder.mixedrecipes.attachment.Attachments;
 import com.odder.mixedrecipes.integrations.remi.CreativeTab;
@@ -12,6 +13,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerChangeGameTypeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -33,6 +35,12 @@ public class ClientUnlocks {
         }
 
         StackCacheManager.INSTANCE.notifyChanged();
+    }
+
+    @SubscribeEvent
+    private void onGameModeChanged(ClientPlayerChangeGameTypeEvent event) {
+        StackCacheManager.INSTANCE.notifyChanged();
+        MixedRecipes.LOGGER.debug("Gamemode changed, busted stack cache.");
     }
 
     @SubscribeEvent

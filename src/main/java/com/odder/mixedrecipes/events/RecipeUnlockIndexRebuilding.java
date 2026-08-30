@@ -1,6 +1,6 @@
 package com.odder.mixedrecipes.events;
 
-import com.odder.mixedrecipes.recipe.RecipeIndex;
+import com.odder.mixedrecipes.recipe.index.RecipeIndex;
 import net.neoforged.bus.api.Event;
 
 public class RecipeUnlockIndexRebuilding extends Event {

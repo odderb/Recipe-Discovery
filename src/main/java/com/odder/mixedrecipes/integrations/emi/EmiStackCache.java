@@ -77,6 +77,12 @@ public class EmiStackCache implements StackCache {
         List<? extends EmiIngredient> original = lastProvided.getOrDefault(sidebarType, EmiSidebars.getStacks(sidebarType));
 
         var player = Minecraft.getInstance().player;
+
+        if (player.isCreative()) {
+            cache.put(sidebarType, original);
+            return;
+        }
+
         var seen = player.getData(Attachments.SEEN_ITEMS)
                 .stream().map(Holder::value)
                 .collect(Collectors.toSet());
