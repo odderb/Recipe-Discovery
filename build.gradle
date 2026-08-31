@@ -63,6 +63,10 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+
+    repositories {
+        maven { url 'https://maven.blamejared.com' }
+    }
 }
 
 base {
@@ -128,6 +132,8 @@ dependencies {
     compileOnly "maven.modrinth:yacl:${yacl_version}-neoforge"
 
     compileOnly("mezz.jei:jei-${minecraft_soft_version}-neoforge-api:${jei_version}")
+    compileOnly "vazkii.patchouli:Patchouli:${patchouli_version}:api"
+    compileOnly "vazkii.patchouli:Patchouli:${patchouli_version}"
 
     compileOnly "curse.maven:emi-recipe-sharing-1587795:8570049"
 
@@ -146,6 +152,22 @@ dependencies {
 
     if (project.hasProperty("withSharing")) {
         implementation "curse.maven:emi-recipe-sharing-1587795:8570049"
+    }
+
+    // for testing extra non vanilla recipes
+    if (project.hasProperty("withVitae")) {
+        implementation "curse.maven:modonomicon-538392:8532346"
+        implementation "curse.maven:geckolib-388172:8350073"
+        implementation "curse.maven:neovitae-1404763:8767463"
+    }
+
+    if (project.hasProperty("withSupplementaries")) {
+        implementation "curse.maven:selene-499980:8749776"
+        implementation "curse.maven:supplementaries-412082:8244187"
+    }
+
+    if (project.hasProperty("withPatchouli")) {
+        runtimeOnly "vazkii.patchouli:Patchouli:${patchouli_version}"
     }
 }
 

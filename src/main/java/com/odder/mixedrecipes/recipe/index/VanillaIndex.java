@@ -43,18 +43,18 @@ public class VanillaIndex extends RecipeIndex {
                     }
                 }
                 if (added) {
-                    addRequirementForRecipe(holder, req);
+                    addRequirementForRecipe(holder.id(), req);
                 }
             }
             for (var input : inputs) {
-                addItemForRecipe(input, holder);
+                addItemForRecipe(input, holder.id());
             }
         }
 
         for (RecipeHolder<?> holder : recipes) {
-            var requirements = getRequirements(holder);
+            var requirements = getRequirements(holder.id());
             if (requirements.isEmpty()) {
-                addDefaultUnlock(holder);
+                addDefaultUnlock(holder.id());
             }
         }
 

@@ -2,6 +2,7 @@ package com.odder.mixedrecipes;
 
 import com.odder.mixedrecipes.attachment.Attachments;
 import com.odder.mixedrecipes.commands.RecipeCommands;
+import com.odder.mixedrecipes.integrations.IntegrationFlags;
 import com.odder.mixedrecipes.integrations.StackCacheManager;
 import com.odder.mixedrecipes.integrations.remi.CreativeTab;
 import com.odder.mixedrecipes.packet.Packets;
@@ -25,12 +26,10 @@ public class MixedRecipes {
     public static final String MODID = "mixedrecipes";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static boolean REMI_ENABLED = false;
-    public static boolean EMI_ENABLED = false;
-
     public MixedRecipes(IEventBus modEventBus, ModContainer modContainer) {
-        REMI_ENABLED = ModList.get().isLoaded("remi");
-        EMI_ENABLED = ModList.get().isLoaded("emi");
+        IntegrationFlags.REMI = ModList.get().isLoaded("remi");
+        IntegrationFlags.EMI = ModList.get().isLoaded("emi");
+        IntegrationFlags.PATCHOULI = ModList.get().isLoaded("patchouli");
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
@@ -42,7 +41,7 @@ public class MixedRecipes {
         NeoForge.EVENT_BUS.register(RecipeCommands.class);
         NeoForge.EVENT_BUS.register(StackCacheManager.INSTANCE);
 
-        if (REMI_ENABLED) {
+        if (IntegrationFlags.REMI) {
             // Creative tab only exists for REMI integration
             CreativeTab.register(modEventBus);
         }

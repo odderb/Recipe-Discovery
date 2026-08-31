@@ -1,6 +1,7 @@
 package com.odder.mixedrecipes.packet;
 
 import com.odder.mixedrecipes.MixedRecipes;
+import com.odder.mixedrecipes.integrations.IntegrationFlags;
 import com.odder.mixedrecipes.integrations.StackCacheManager;
 import com.odder.mixedrecipes.integrations.remi.CreativeTab;
 import io.netty.buffer.ByteBuf;
@@ -25,7 +26,7 @@ public record NotifyUnlocksPacket() implements CustomPacketPayload {
         if (ctx.player() instanceof LocalPlayer) {
             StackCacheManager.INSTANCE.notifyChanged();
 
-            if (MixedRecipes.REMI_ENABLED) {
+            if (IntegrationFlags.REMI) {
                 CreativeTab.refresh();
             }
         }

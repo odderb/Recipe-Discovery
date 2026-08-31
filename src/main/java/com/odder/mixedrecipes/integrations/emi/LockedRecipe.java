@@ -17,6 +17,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class LockedRecipe implements EmiRecipe {
     private static final int TEXT_COLOR = 0xFFFFFF;
@@ -24,11 +28,14 @@ public class LockedRecipe implements EmiRecipe {
     private static final ResourceLocation MISSING_ITEM_TEXTURE = ResourceLocation.fromNamespaceAndPath(MixedRecipes.MODID, "textures/gui/question-mark.png");
 
     private final EmiRecipe delegate;
-    private final RecipeHolder<?> holder;
 
-    public LockedRecipe(EmiRecipe delegate, RecipeHolder<?> recipeHolder) {
+    public LockedRecipe(EmiRecipe delegate) {
         this.delegate = delegate;
-        this.holder = recipeHolder;
+    }
+
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     @Override
@@ -123,7 +130,7 @@ public class LockedRecipe implements EmiRecipe {
 
     private Component getItemText() {
         MutableComponent text = Component.empty();
-        getOutputs().forEach(output -> text.append(output.getItemStack().getDisplayName()));
+        getOutputs().forEach(output -> text.append(output.getName()));
         return text;
     }
 }

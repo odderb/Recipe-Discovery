@@ -3,6 +3,7 @@ package com.odder.mixedrecipes.unlocks.client;
 import com.evandev.remi.feature.creativemodetab.CreativeModeTabManager;
 import com.odder.mixedrecipes.MixedRecipes;
 import com.odder.mixedrecipes.MixedRecipesClient;
+import com.odder.mixedrecipes.integrations.IntegrationFlags;
 import com.odder.mixedrecipes.integrations.StackCacheManager;
 import com.odder.mixedrecipes.attachment.Attachments;
 import com.odder.mixedrecipes.integrations.remi.CreativeTab;
@@ -46,7 +47,7 @@ public class ClientUnlocks {
     @SubscribeEvent
     private void onScreenOpening(ScreenEvent.Opening ev) {
         if (ev.getNewScreen() instanceof InventoryScreen) {
-            if (MixedRecipes.REMI_ENABLED) {
+            if (IntegrationFlags.REMI) {
                 CreativeTab.refresh();
             }
         }
@@ -54,7 +55,7 @@ public class ClientUnlocks {
 
     @SubscribeEvent
     private void onScreenInitPost(ScreenEvent.Init.Post ev) {
-        if (!MixedRecipes.REMI_ENABLED) return;
+        if (!IntegrationFlags.REMI) return;
 
         try {
             Class<?> mgr = CreativeModeTabManager.class;

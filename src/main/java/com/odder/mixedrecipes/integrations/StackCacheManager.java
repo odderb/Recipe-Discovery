@@ -20,7 +20,7 @@ public class StackCacheManager {
         busyCaches.addAll(caches);
 
         // TODO: find a better place for dis
-        if (MixedRecipes.REMI_ENABLED) {
+        if (IntegrationFlags.REMI) {
             StackManager.invalidateStacks();
         }
     }

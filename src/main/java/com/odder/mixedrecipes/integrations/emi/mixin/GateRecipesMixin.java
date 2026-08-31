@@ -41,14 +41,11 @@ public class GateRecipesMixin {
         }
 
         var unlocks = mc.player.getData(Attachments.UNLOCKED_RECIPES);
-        var rm = mc.level.getRecipeManager();
 
         return provided.stream().map(r -> {
             ResourceLocation id = r.getId();
             if (id == null) return r;
-            RecipeHolder<?> holder = rm.byKey(id).orElse(null);
-            if (holder == null) return r;
-            return unlocks.contains(r.getId()) ? r : new LockedRecipe(r, holder);
+            return unlocks.contains(r.getId()) ? r : new LockedRecipe(r);
         }).toList();
     }
 }

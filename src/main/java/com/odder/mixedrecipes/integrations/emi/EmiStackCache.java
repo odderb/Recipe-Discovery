@@ -5,6 +5,7 @@ import com.evandev.remi.feature.stackgroup.data.EmiStackGroup;
 import com.odder.mixedrecipes.Config;
 import com.odder.mixedrecipes.MixedRecipes;
 import com.odder.mixedrecipes.attachment.Attachments;
+import com.odder.mixedrecipes.integrations.IntegrationFlags;
 import com.odder.mixedrecipes.integrations.OutputItemsStackCache;
 import com.odder.mixedrecipes.integrations.StackCache;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -104,7 +105,7 @@ public class EmiStackCache implements StackCache {
                     if (hideLocked) {
                         List<EmiStack> stacks = ingredient.getEmiStacks();
 
-                        if (MixedRecipes.REMI_ENABLED) {
+                        if (IntegrationFlags.REMI) {
                             if (ingredient instanceof EmiGroupStack group) {
                                 stacks = group.getItems().stream().flatMap(item -> item.getEmiStacks().stream()).toList();
                             }
@@ -120,7 +121,7 @@ public class EmiStackCache implements StackCache {
                     return true;
                 })
                 .peek(ingredient -> {
-                    if (MixedRecipes.REMI_ENABLED) {
+                    if (IntegrationFlags.REMI) {
                         if (ingredient instanceof EmiGroupStack group) {
                             groupIngredients.addAll(group.getItems().stream().flatMap(item -> item.getEmiStacks().stream()).toList());
                         }
